@@ -18,6 +18,8 @@ def Led(Led_Pin):
         sleep(0.5)
         Led.off()
         sleep(random())
+    if stop_alarm:
+        Led.off()
 
 def Buzzer(Buzzer_Pin):
     Buzzer = gpiozero.Buzzer(Buzzer_Pin)
@@ -29,6 +31,8 @@ def Buzzer(Buzzer_Pin):
         sleep(0.5)
         Buzzer.on()
         sleep(0.5)
+        Buzzer.off()
+    if stop_alarm:
         Buzzer.off()
 
 def Console(Sleep_time):
