@@ -1,1 +1,1 @@
-These are my programing projects which i like to save here on my github. Feel free to use my code under the cc by nc sa license, for more information view the license.md file.
+These are my programing projects which i like to save here on my github. Feel free to use my code under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) license, for more information view the license.md file.
