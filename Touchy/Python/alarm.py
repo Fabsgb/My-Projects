@@ -38,7 +38,7 @@ def Buzzer(Buzzer_Pin):
 def Console(Sleep_time):
     global stop_alarm
     while not stop_alarm:
-        print(Fore.RED + "ALARM!")
+        print(Fore.RED + "ALARM!" + Fore.RESET)
         sleep(Sleep_time)
 
 def Start_Alarm(Buzzer_Pin: int, Led_Pin: int, Sleep_Time: float):
@@ -57,4 +57,4 @@ def Stop_Alarm():
     buzzer.join()
     led.join()
     console.join()
-    print(Fore.GREEN + "Stopped the Alarm!")
+    print(Fore.GREEN + "Stopped the Alarm!" + Fore.RESET)
