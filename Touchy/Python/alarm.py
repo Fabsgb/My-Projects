@@ -13,11 +13,10 @@ def Led(Led_Pin):
     Led = gpiozero.LED(Led_Pin)
     global stop_alarm
     while not stop_alarm:
-        sleep(0.25)
         Led.on()
         sleep(0.5)
         Led.off()
-        sleep(random())
+        sleep(random() + 0.25)
     if stop_alarm:
         Led.off()
 
