@@ -1,5 +1,5 @@
 import gpiozero
-import threading
+from threading import Thread
 from time import sleep
 from random import random
 from colorama import Fore
@@ -43,9 +43,9 @@ def Console(Sleep_time):
 def Start_Alarm(Buzzer_Pin: int, Led_Pin: int, Sleep_Time: float):
     global stop_alarm, buzzer, led, console
     stop_alarm = False
-    buzzer = threading.Thread(target=Buzzer, args=(Buzzer_Pin,))
-    led = threading.Thread(target=Led, args=(Led_Pin,))
-    console = threading.Thread(target=Console, args=(Sleep_Time,))
+    buzzer = Thread(target=Buzzer, args=(Buzzer_Pin,))
+    led = Thread(target=Led, args=(Led_Pin,))
+    console = Thread(target=Console, args=(Sleep_Time,))
     buzzer.start()
     led.start()
     console.start()

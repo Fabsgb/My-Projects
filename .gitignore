@@ -1,6 +1,9 @@
 #files from the lg library
 .lgd-nfy*
 
+auto-py-to-exe/
+output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
