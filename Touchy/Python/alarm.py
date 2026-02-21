@@ -1,38 +1,32 @@
 import gpiozero
 from threading import Thread
 from time import sleep
-from random import random
 from colorama import Fore
 
 stop_alarm = False
-buzzer = None
-led = None
-console = None
+led_thread = None
+buzzer_thread = None
+console_thread = None
 
-def Led(Led_Pin):
-    Led = gpiozero.LED(Led_Pin)
+def Led(Led_Pin, Led_Sleep):
+    led = gpiozero.LED(Led_Pin)
     global stop_alarm
     while not stop_alarm:
-        Led.on()
-        sleep(0.5)
-        Led.off()
-        sleep(random() + 0.25)
-    if stop_alarm:
-        Led.off()
+        led.on()
+        sleep(Led_Sleep)
+        led.off()
+        sleep(Led_Sleep)
+    led.off()
 
-def Buzzer(Buzzer_Pin):
-    Buzzer = gpiozero.Buzzer(Buzzer_Pin)
+def Buzzer(Buzzer_Pin, Buzzer_Sleep):
+    buzzer = gpiozero.Buzzer(Buzzer_Pin)
     global stop_alarm
     while not stop_alarm:
-        Buzzer.on()
-        sleep(1)
-        Buzzer.off()
-        sleep(0.5)
-        Buzzer.on()
-        sleep(0.5)
-        Buzzer.off()
-    if stop_alarm:
-        Buzzer.off()
+        buzzer.on()
+        sleep(Buzzer_Sleep)
+        buzzer.off()
+        sleep(Buzzer_Sleep)
+    buzzer.off()
 
 def Console(Sleep_time):
     global stop_alarm
@@ -40,20 +34,20 @@ def Console(Sleep_time):
         print(Fore.RED + "ALARM!" + Fore.RESET)
         sleep(Sleep_time)
 
-def Start_Alarm(Buzzer_Pin: int, Led_Pin: int, Sleep_Time: float):
-    global stop_alarm, buzzer, led, console
+def Start_Alarm(Buzzer_Pin: int, Buzzer_Sleep: float, Led_Pin: int, Led_Sleep: float, Console_Sleep: float):
+    global stop_alarm, buzzer_thread, led_thread, console_thread
     stop_alarm = False
-    buzzer = Thread(target=Buzzer, args=(Buzzer_Pin,))
-    led = Thread(target=Led, args=(Led_Pin,))
-    console = Thread(target=Console, args=(Sleep_Time,))
-    buzzer.start()
-    led.start()
-    console.start()
+    buzzer_thread = Thread(target=Buzzer, args=(Buzzer_Pin, Buzzer_Sleep))
+    led_thread = Thread(target=Led, args=(Led_Pin, Led_Sleep))
+    console_thread = Thread(target=Console, args=(Console_Sleep,))
+    buzzer_thread.start()
+    led_thread.start()
+    console_thread.start()
 
 def Stop_Alarm():
-    global stop_alarm, buzzer, led, console
+    global stop_alarm
     stop_alarm = True
-    buzzer.join()
-    led.join()
-    console.join()
+    if buzzer_thread: buzzer_thread.join()
+    if led_thread: led_thread.join()
+    if console_thread: console_thread.join()
     print(Fore.GREEN + "Stopped the Alarm!" + Fore.RESET)
