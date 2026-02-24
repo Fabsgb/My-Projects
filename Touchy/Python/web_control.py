@@ -43,8 +43,11 @@ def home():
     """Serves the main index.html page."""
     return render_template('index.html')
 
-@app.route('/api/status', methods=['GET'])
+@app.route('/api/status', methods=['POST'])
 def get_status():
+    data = request.get_json()
+    if not data or data.get('password') != "Password":
+        return jsonify({'error': 'Incorrect password'}), 401
     return jsonify({**alarm_state, 'logs': system_logs})
 
 @app.route('/api/toggle', methods=['POST'])
@@ -99,6 +102,33 @@ if __name__ == '__main__':
             s.close()
         return IP
 
-    print(f"\n\n *** ACCESS WEBSITE AT: https://{get_ip()}:5000 *** \n\n")
+    # Start a simple HTTP server on port 80 to redirect to HTTPS:8000
+    def run_redirector():
+        from http.server import HTTPServer, BaseHTTPRequestHandler
+        
+        class RedirectHandler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                # Redirect to the same host but on port 8000 and HTTPS
+                host = self.headers.get('Host', '').split(':')[0]
+                new_url = f"https://{host}:8000{self.path}"
+                self.send_response(301)
+                self.send_header('Location', new_url)
+                self.end_headers()
+            def log_message(self, format, *args):
+                pass # Silence logs
+
+        try:
+            server = HTTPServer(('0.0.0.0', 80), RedirectHandler)
+            print(" * Auto-redirect running: Type IP (http://...) -> redirects to HTTPS:8000")
+            server.serve_forever()
+        except PermissionError:
+            print(" ! NOTE: Run with 'sudo' to enable auto-redirect from port 80.")
+
+    Thread(target=run_redirector, daemon=True).start()
+
+    print(f"\n\n *** ACCESS WEBSITE AT: https://{get_ip()}:8000 *** \n\n")
     # debug=True is great for development
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    cert_path = os.path.join(basedir, 'cert.pem')
+    key_path = os.path.join(basedir, 'key.pem')
+    app.run(host='0.0.0.0', port=8000, debug=False, use_reloader=False, ssl_context=(cert_path, key_path), threaded=True)

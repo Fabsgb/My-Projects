@@ -10,6 +10,9 @@ const notificationBell = document.getElementById('notification-bell');
 let sessionPassword = null;
 let notificationsEnabled = false;
 let wasTriggered = false; // To prevent multiple notifications
+let statusInterval = null;
+let failedAttempts = 0;
+let isPolling = false;
 
 /**
  * Adds a new message to the log on the webpage.
@@ -25,11 +28,28 @@ function addLogMessage(message) {
  * Fetches the current alarm status from the server and updates the UI.
  */
 async function updateStatus() {
+    if (!sessionPassword) return;
+    if (isPolling) return; // DDoS protection: prevent request stacking
+    isPolling = true;
+
     try {
-        const response = await fetch('/api/status');
+        const response = await fetch('/api/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: sessionPassword })
+        });
+
+        if (response.status === 401) {
+            // Password incorrect or session expired
+            handleAuthFailure();
+            return;
+        }
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        failedAttempts = 0; // Reset on success
         const data = await response.json();
 
         // Check for trigger state change to send notification
@@ -37,7 +57,6 @@ async function updateStatus() {
             if (notificationsEnabled && Notification.permission === "granted") {
                 new Notification("ALARM TRIGGERED!", {
                     body: "The security system has been activated.",
-                    // You could add an icon here, e.g., icon: '/path/to/icon.png'
                 });
             }
             wasTriggered = true;
@@ -87,6 +106,9 @@ async function updateStatus() {
         armedTextElement.textContent = 'Unknown';
         armedTextElement.style.color = 'grey';
     }
+    finally {
+        isPolling = false;
+    }
 }
 
 /**
@@ -127,10 +149,48 @@ async function toggleNotifications() {
  * Saves the password from the modal and retries the action.
  */
 function submitPassword() {
+    if (modalPasswordInput.disabled) return;
+
     const input = modalPasswordInput.value;
     if (input) {
         sessionPassword = input;
         passwordModal.style.display = "none";
+        
+        // Start polling now that we have a password
+        updateStatus();
+        if (!statusInterval) {
+            statusInterval = setInterval(updateStatus, 2000);
+        }
+    }
+}
+
+function handleLogout() {
+    clearInterval(statusInterval);
+    statusInterval = null;
+    sessionPassword = null;
+    passwordModal.style.display = "block";
+    modalPasswordInput.value = '';
+}
+
+function handleAuthFailure() {
+    failedAttempts++;
+    handleLogout();
+    addLogMessage("Error: Incorrect Password.");
+
+    if (failedAttempts >= 5) {
+        alert("Too many failed attempts. You are locked out for 30 seconds.");
+        modalPasswordInput.disabled = true;
+        const btn = passwordModal.querySelector('button');
+        if (btn) btn.disabled = true;
+
+        setTimeout(() => {
+            failedAttempts = 0;
+            modalPasswordInput.disabled = false;
+            if (btn) btn.disabled = false;
+            modalPasswordInput.focus();
+        }, 30000);
+    } else {
+        alert(`Incorrect Password. Attempt ${failedAttempts}/5`);
     }
 }
 
@@ -177,11 +237,7 @@ async function toggleState() {
 
         if (!response.ok) {
             if (response.status === 401) {
-                sessionPassword = null; // Reset password if incorrect
-                addLogMessage("Error: Incorrect Password.");
-                passwordModal.style.display = "block"; // Show modal again
-                modalPasswordInput.value = '';
-                modalPasswordInput.focus();
+                handleAuthFailure();
                 return;
             }
             const errorMessage = data.error || `Request failed with status: ${response.status}`;
@@ -201,8 +257,6 @@ async function toggleState() {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    updateStatus();
-
     // Visually disable notifications if not on a secure context like localhost or https
     if (!window.isSecureContext) {
         notificationBell.style.opacity = '0.2';
@@ -212,7 +266,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show password modal on load
     passwordModal.style.display = "block";
     modalPasswordInput.focus();
-
-    // Check status every 2 seconds
-    setInterval(updateStatus, 2000);
 });
