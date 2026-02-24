@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Alarm Control Center</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=TASA+Explorer:wght@400..800&display=swap" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <span id="notification-bell" onclick="toggleNotifications()" style="font-family: sans-serif;">🔔</span>
+        <h1>Alarm Control Center</h1>
+        <p>Status: <span id="status-text">Checking...</span></p>
+        <br>
+        <p>Armed: <span id="armed-text">Unknown</span></p>
+        <br>
+        <button id="toggle-button" onclick="toggleState()">Arm</button>
+        <br>
+        <button onclick="clearLogs()" style="margin-top: 1%;">Clear Log</button>
+        <p class="bold">Log:</p>
+        <br>
+        <div id="log-container"></div>
+
+        <!-- Password Popup Modal -->
+        <div id="password-modal" class="modal">
+            <div class="modal-content">
+                <h2>Authentication</h2>
+                <p>Please enter session password:</p>
+                <form onsubmit="event.preventDefault(); submitPassword();">
+                    <input type="password" id="modal-password-input" placeholder="Password">
+                    <br><br>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
