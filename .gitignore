@@ -1,6 +1,9 @@
 #files from the lg library
 .lgd-nfy*
 
+cert.pem
+key.pem
+
 auto-py-to-exe/
 output/
 
