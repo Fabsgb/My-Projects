@@ -9,7 +9,6 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv("/home/fabsgb/Desktop/Programieren/variables.env")
-print(os.environ.get('web_password'))
 
 app = Flask(__name__,
             # Point both templates and static files to your desired folder
@@ -38,7 +37,7 @@ def monitor_alarm():
         if alarm_state['is_running']:
             alarm_state['is_triggered'] = True
             add_log("ALARM TRIGGERED!")
-            alarm.Start_Alarm(Buzzer_Pin=3, Buzzer_Sleep=0.5, Led_Pin=17, Led_Sleep=0.66, Console_Sleep=0.25)
+            alarm.Start_Alarm(Buzzer_Pin=3, Buzzer_Sleep=0.5, Led_Pin=17, Led_Sleep=0.66, Console_Sleep=0)
     except Exception as e:
         print(f"Error in monitor thread: {e}")
 
@@ -50,8 +49,7 @@ def home():
 @app.route('/api/status', methods=['POST'])
 def get_status():
     data = request.get_json()
-    if not data or data.get('password') != os.environ('web_password'): #You thought you could get my password but naaahhhhh it isnt here 
-    if not data or data.get('password') != os.environ.get('web_password'): #You thought you could get my password but naaahhhhh it isnt here 
+    if not data or data.get('password') != os.environ['web_password']: #You thought you could get my password but naaahhhhh it isnt here 
         return jsonify({'error': 'Incorrect password'}), 401
     return jsonify({**alarm_state, 'logs': system_logs})
 
@@ -60,7 +58,7 @@ def toggle_alarm():
     try:
         # Get the password sent from the website
         data = request.get_json()
-        if not data or data.get('password') != "Password":
+        if not data or data.get('password') != os.environ['web_password']:
             return jsonify({'error': 'Incorrect password'}), 401
 
         if alarm_state['is_running']:
@@ -87,7 +85,7 @@ def toggle_alarm():
 @app.route('/api/logs/clear', methods=['POST'])
 def clear_logs():
     data = request.get_json()
-    if not data or data.get('password') != "Password":
+    if not data or data.get('password') != os.environ['web_password']:
         return jsonify({'error': 'Incorrect password'}), 401
     system_logs.clear()
     add_log("Logs cleared.")

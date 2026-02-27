@@ -41,10 +41,11 @@ def Start_Alarm(Buzzer_Pin: int, Buzzer_Sleep: float, Led_Pin: int, Led_Sleep: f
     buzzer = gpiozero.Buzzer(Buzzer_Pin)
     buzzer_thread = Thread(target=Buzzer, args=(buzzer, Buzzer_Sleep))
     led_thread = Thread(target=Led, args=(led, Led_Sleep))
-    console_thread = Thread(target=Console, args=(Console_Sleep,))
+    if Console_Sleep > 0:
+        console_thread = Thread(target=Console, args=(Console_Sleep,))
+        console_thread.start()
     buzzer_thread.start()
     led_thread.start()
-    console_thread.start()
 
 def Stop_Alarm():
     global stop_alarm, led, buzzer
