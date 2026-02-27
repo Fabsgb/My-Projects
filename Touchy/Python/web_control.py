@@ -6,6 +6,10 @@ from waiting import wait
 from datetime import datetime
 import socket
 import os
+from dotenv import load_dotenv
+
+load_dotenv("/home/fabsgb/Desktop/Programieren/variables.env")
+print(os.environ.get('web_password'))
 
 app = Flask(__name__,
             # Point both templates and static files to your desired folder
@@ -46,7 +50,8 @@ def home():
 @app.route('/api/status', methods=['POST'])
 def get_status():
     data = request.get_json()
-    if not data or data.get('password') != "Password":
+    if not data or data.get('password') != os.environ('web_password'): #You thought you could get my password but naaahhhhh it isnt here 
+    if not data or data.get('password') != os.environ.get('web_password'): #You thought you could get my password but naaahhhhh it isnt here 
         return jsonify({'error': 'Incorrect password'}), 401
     return jsonify({**alarm_state, 'logs': system_logs})
 
