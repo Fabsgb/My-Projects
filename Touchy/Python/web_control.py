@@ -21,8 +21,12 @@ alarm_state = {'is_running': False, 'is_triggered': False}
 system_logs = []
 
 def add_log(message):
-    timestamp = datetime.now().strftime("%H:%M:%S")
+    timestamp = datetime.now().strftime("%d.%B-%Y H:%M:%S")
     system_logs.insert(0, f"[{timestamp}] {message}")
+    if "alarm" in message.casefold() or "Logs" in message:
+        with open("/home/fabsgb/Desktop/Programieren/Touchy/Python/log.txt", "a") as f:
+            f.write(f"[{timestamp}] {message}\n")
+
 
 sensor = Button(4)
 
