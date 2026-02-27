@@ -1,6 +1,8 @@
 #files from the lg library
 .lgd-nfy*
 
+#Passwords and certificates
+*.env
 *.pem
 
 auto-py-to-exe/
