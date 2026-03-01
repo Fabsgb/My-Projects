@@ -9,6 +9,8 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv("/home/fabsgb/Desktop/Programieren/variables.env")
+log_file = f"/home/fabsgb/Desktop/Programieren/Touchy/Python/{datetime.now().strftime('%d.%B.%Y %H.%M.%S')}.log"
+
 
 app = Flask(__name__,
             # Point both templates and static files to your desired folder
@@ -21,10 +23,11 @@ alarm_state = {'is_running': False, 'is_triggered': False}
 system_logs = []
 
 def add_log(message):
-    timestamp = datetime.now().strftime("%d.%B-%Y H:%M:%S")
+    global log_file
+    timestamp = datetime.now().strftime("%d.%B.%Y %H:%M:%S")
     system_logs.insert(0, f"[{timestamp}] {message}")
     if "alarm" in message.casefold() or "Logs" in message:
-        with open("/home/fabsgb/Desktop/Programieren/Touchy/Python/log.txt", "a") as f:
+        with open(log_file, "a") as f:
             f.write(f"[{timestamp}] {message}\n")
 
 
