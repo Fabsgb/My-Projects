@@ -5,6 +5,7 @@
 *.env
 *.pem
 
+*noip*
 auto-py-to-exe/
 output/
 
