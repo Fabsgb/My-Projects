@@ -9,7 +9,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv("/home/fabsgb/Desktop/Programieren/variables.env")
-log_file = f"/home/fabsgb/Desktop/Programieren/Touchy/Python/{datetime.now().strftime('%d.%B.%Y %H.%M.%S')}.log"
+log_file = f"/home/fabsgb/Desktop/Programieren/Touchy/Python/{datetime.now().strftime('%d.%B.%Y %H:%M:%S')}.log"
 
 
 app = Flask(__name__,
