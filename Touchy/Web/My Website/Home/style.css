@@ -19,3 +19,12 @@ a:visited{
     color: antiquewhite;
     text-decoration: none;
 }
+
+a{
+    font-size: large;
+}
+
+.left{
+    position: fixed;
+    left: 0;
+}
